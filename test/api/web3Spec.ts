@@ -31,17 +31,20 @@ describe('/submitKey', () => {
       })
   })
 
-  it('POST public wallet key in request body gets rejected as such', () => {
-    return frisby.post(REST_URL + '/submitKey', {
-      privateKey: '0x02c7a2a93289c9fbda5990bac6596993e9bb0a8d3f178175a80b7cfd983983f506'
-    })
-      .expect('status', 401)
-      .expect('header', 'content-type', /application\/json/)
-      .expect('json', {
+  const TEST_PRIVATE_KEY = process.env.TEST_PRIVATE_KEY!
+
+    it('POST private key in request body gets accepted', () => {
+        return frisby.post(REST_URL + '/submitKey', {
+        privateKey: TEST_PRIVATE_KEY
+        })
+
+        .expect('status', 401)
+        .expect('header', 'content-type', /application\/json/)
+        .expect('json', {
         success: false,
         message: 'Looks like you entered the public key of my ethereum wallet!'
-      })
-  })
+        })
+    })
 
   it('POST wallet address in request body gets rejected as such', () => {
     return frisby.post(REST_URL + '/submitKey', {

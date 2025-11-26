@@ -17,7 +17,7 @@ const API_URL = 'http://localhost:3000/api'
 
 const jsonHeader = { 'content-type': 'application/json' }
 
-async function login ({ email, password, totpSecret }: { email: string, password: string, totpSecret?: string }) {
+async function login({ email, password, totpSecret }: { email: string, password: string, totpSecret?: string }) {
   // @ts-expect-error FIXME promise return handling broken
   const loginRes = await frisby
     .post(REST_URL + '/user/login', {
@@ -48,7 +48,7 @@ async function login ({ email, password, totpSecret }: { email: string, password
   return loginRes.json.authentication
 }
 
-async function register ({ email, password, totpSecret }: { email: string, password: string, totpSecret?: string }) {
+async function register({ email, password, totpSecret }: { email: string, password: string, totpSecret?: string }) {
   // @ts-expect-error FIXME promise return handling broken
   const res = await frisby
     .post(API_URL + '/Users/', {
@@ -81,14 +81,14 @@ async function register ({ email, password, totpSecret }: { email: string, passw
           initialToken: otplib.authenticator.generate(totpSecret)
         }
       }).expect('status', 200).catch(() => {
-      throw new Error(`Failed to enable 2fa for user: '${email}'`)
-    })
+        throw new Error(`Failed to enable 2fa for user: '${email}'`)
+      })
   }
 
   return res
 }
 
-function getStatus (token: string) {
+function getStatus(token: string) {
   return frisby.get(
     REST_URL + '/2fa/status',
     {
@@ -171,7 +171,7 @@ describe('/rest/2fa/status', () => {
   it('GET should indicate 2fa is setup for 2fa enabled users', async () => {
     const { token } = await login({
       email: `wurstbrot@${config.get<string>('application.domain')}`,
-      password: 'EinBelegtesBrotMitSchinkenSCHINKEN!',
+      password: config.get<string>('testUserPassword'),
       totpSecret: 'IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH'
     })
 

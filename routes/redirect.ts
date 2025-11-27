@@ -14,23 +14,20 @@ export function performRedirect () {
   return ({ query }: Request, res: Response, next: NextFunction) => {
     const toUrl: string = String(query.to || '')
 
-    const allowed = [
-      'https://explorer.dash.org/address/Xr556RzuwX6hg5EGpkybbv5RanJoZN17kW',
-      'https://blockchain.info/address/1AbKfgvw9psQ41NbLi8kufDQTezwG8DRZm',
-      'https://etherscan.io/address/0x0f933ab9fcaaa782d0279c300d73750e1311eae6'
-    ]
+    try {
+      const parsed = new URL(toUrl, 'https://your-site.com')
 
-    const isInternal = toUrl.startsWith('/')
-    const isCryptoAllowed = allowed.includes(toUrl)
+      if (parsed.origin !== 'https://your-site.com') {
+        return res.status(400).json({ error: 'Invalid redirect target' })
+      }
 
-    if (isInternal || isCryptoAllowed) {
-      res.redirect(toUrl)
-    } else {
-      res.status(400)
-      next(new Error('Invalid redirect target: ' + toUrl))
+      return res.redirect(parsed.pathname + parsed.search)
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL format' })
     }
   }
 }
+
 
 
 function isUnintendedRedirect (toUrl: string) {

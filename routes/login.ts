@@ -32,7 +32,6 @@ export function login () {
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req)
 
-    // ✅ FIXED SQL INJECTION — parametrized query
     models.sequelize.query(
       'SELECT * FROM Users WHERE email = ? AND password = ? AND deletedAt IS NULL',
       {
@@ -57,7 +56,6 @@ export function login () {
             }
           })
         } else if (user.data?.id) {
-          // @ts-expect-error FIXME some properties missing in user
           afterLogin(user, res, next)
         } else {
           res.status(401).send(res.__('Invalid email or password.'))
@@ -66,7 +64,6 @@ export function login () {
         next(error)
       })
   }
-  // vuln-code-snippet end loginAdminChallenge loginBenderChallenge loginJimChallenge
 
   function verifyPreLoginChallenges (req: Request) {
     challengeUtils.solveIf(challenges.weakPasswordChallenge, () => { return req.body.email === 'admin@' + config.get<string>('application.domain') && req.body.password === 'admin123' })
